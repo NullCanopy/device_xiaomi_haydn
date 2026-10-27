@@ -18,17 +18,49 @@ from extract_utils.main import (
 )
 
 namespace_imports = [
+    'device/xiaomi/haydn',
     'hardware/qcom-caf/sm8350',
+    'hardware/qcom-caf/wlan',
     'hardware/xiaomi',
+    'vendor/qcom/opensource/commonsys/display',
+    'vendor/qcom/opensource/commonsys-intf/display',
+    'vendor/qcom/opensource/dataservices',
     'vendor/qcom/opensource/display',
-    'vendor/xiaomi/sm8350-common',
 ]
+
+def lib_fixup_vendor_suffix(lib: str, partition: str, *args, **kwargs):
+    return f'{lib}_{partition}' if partition == 'vendor' else None
 
 lib_fixups: lib_fixups_user_type = {
     **lib_fixups,
+    (
+        'com.qualcomm.qti.dpm.api@1.0',
+        'libmmosal',
+        'vendor.qti.hardware.wifidisplaysession@1.0',
+        'vendor.qti.imsrtpservice@3.0',
+    ): lib_fixup_vendor_suffix,
 }
 
 blob_fixups: blob_fixups_user_type = {
+    'system/framework/WfdCommon.jar': blob_fixup()
+        .apktool_patch('configs/blob-patches/WfdCommon.patch'),
+    'system_ext/lib64/libwfdservice.so': blob_fixup()
+        .replace_needed('android.media.audio.common.types-V4-cpp.so', 'android.media.audio.common.types-V5-cpp.so'),
+    'vendor/etc/init/vendor.xiaomi.hardware.citsensorservice@1.1-service.rc': blob_fixup()
+        .add_line_if_missing('    task_profiles ServiceCapacityLow'),
+    ('vendor/etc/media_lahaina/video_system_specs.json', 'vendor/etc/media_shima_v1/video_system_specs.json', 'vendor/etc/media_yupik_v1/video_system_specs.json'): blob_fixup()
+        .regex_replace('"max_retry_alloc_output_timeout": 10000,', '"max_retry_alloc_output_timeout": 0,'),
+    'vendor/etc/vintf/manifest/c2_manifest_vendor.xml': blob_fixup()
+        .regex_replace('.*ozoaudio.*\n?', '')
+        .regex_replace('.*dolby.*\n?', ''),
+    ('vendor/lib64/mediadrm/libwvdrmengine.so', 'vendor/lib64/libwvhidl.so'): blob_fixup()
+        .add_needed('libcrypto_shim.so'),
+    'vendor/lib64/android.hardware.secure_element@1.0-impl.so': blob_fixup()
+        .remove_needed('android.hidl.base@1.0.so'),
+    ('vendor/lib64/libdpps.so', 'vendor/lib64/libsnapdragoncolor-manager.so'): blob_fixup()
+        .replace_needed('libtinyxml2.so', 'libtinyxml2-v34.so'),
+    'vendor/lib64/libmisight.so': blob_fixup()
+        .add_needed('libjsoncpp_shim.so'),
     'vendor/etc/camera/pureShot_parameter.xml': blob_fixup()
         .regex_replace(r'=(\d+)>', r'="\1">'),
     'vendor/lib/hw/audio.primary.haydn.so': blob_fixup()
@@ -73,7 +105,5 @@ module = ExtractUtilsModule(
 )
 
 if __name__ == '__main__':
-    utils = ExtractUtils.device_with_common(
-        module, 'sm8350-common', module.vendor
-    )
+    utils = ExtractUtils.device(module)
     utils.run()
