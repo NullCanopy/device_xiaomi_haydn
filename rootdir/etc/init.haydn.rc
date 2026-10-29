@@ -50,3 +50,8 @@ on post-fs-data && property:ro.boot.hwc=GL
 on post-fs-data && property:ro.boot.hwc=IN
     setprop bluetooth.device.default_name "Mi 11X Pro"
     setprop vendor.usb.product_string "Mi 11X Pro"
+
+# loc_sys_service only talks to the AIDL location HAL, which this vendor
+# doesn't have, and would wait for it forever
+on property:init.svc.loc_sys_service=running
+    stop loc_sys_service
