@@ -1,6 +1,8 @@
 #!/usr/bin/env -S PYTHONPATH=../../../tools/extract-utils python3
 #
-# SPDX-FileCopyrightText: 2024 The LineageOS Project
+# Copyright (C) 2021 The LineageOS Project
+#           (C) 2026 Paranoid Android
+#
 # SPDX-License-Identifier: Apache-2.0
 #
 
@@ -18,14 +20,14 @@ from extract_utils.main import (
 )
 
 namespace_imports = [
-    'device/xiaomi/haydn',
-    'hardware/qcom-caf/sm8350',
-    'hardware/qcom-caf/wlan',
+    'device/qcom/common/vendor/telephony',
+    'hardware/qcom/wlan/qcwcn',
     'hardware/xiaomi',
-    'vendor/qcom/opensource/commonsys/display',
-    'vendor/qcom/opensource/commonsys-intf/display',
-    'vendor/qcom/opensource/dataservices',
-    'vendor/qcom/opensource/display',
+    'vendor/qcom/common/vendor/adreno/r',
+    'vendor/qcom/common/vendor/display/5.4',
+    'vendor/qcom/common/vendor/gps-legacy',
+    'vendor/qcom/common/vendor/media/5.4',
+    'vendor/qcom/common/vendor/perf',
 ]
 
 def lib_fixup_vendor_suffix(lib: str, partition: str, *args, **kwargs):
@@ -42,31 +44,18 @@ lib_fixups: lib_fixups_user_type = {
 }
 
 blob_fixups: blob_fixups_user_type = {
-    'system/framework/WfdCommon.jar': blob_fixup()
-        .apktool_patch('configs/blob-patches/WfdCommon.patch'),
-    'system_ext/lib64/libwfdservice.so': blob_fixup()
-        .replace_needed('android.media.audio.common.types-V4-cpp.so', 'android.media.audio.common.types-V5-cpp.so'),
     'vendor/etc/init/vendor.xiaomi.hardware.citsensorservice@1.1-service.rc': blob_fixup()
         .add_line_if_missing('    task_profiles ServiceCapacityLow'),
     ('vendor/etc/media_lahaina/video_system_specs.json', 'vendor/etc/media_shima_v1/video_system_specs.json', 'vendor/etc/media_yupik_v1/video_system_specs.json'): blob_fixup()
         .regex_replace('"max_retry_alloc_output_timeout": 10000,', '"max_retry_alloc_output_timeout": 0,'),
-    'vendor/etc/vintf/manifest/c2_manifest_vendor.xml': blob_fixup()
-        .regex_replace('.*ozoaudio.*\n?', '')
-        .regex_replace('.*dolby.*\n?', ''),
     ('vendor/lib64/mediadrm/libwvdrmengine.so', 'vendor/lib64/libwvhidl.so'): blob_fixup()
         .add_needed('libcrypto_shim.so'),
     'vendor/lib64/android.hardware.secure_element@1.0-impl.so': blob_fixup()
         .remove_needed('android.hidl.base@1.0.so'),
-    ('vendor/lib64/libdpps.so', 'vendor/lib64/libsnapdragoncolor-manager.so'): blob_fixup()
-        .replace_needed('libtinyxml2.so', 'libtinyxml2-v34.so'),
     'vendor/lib64/libmisight.so': blob_fixup()
         .add_needed('libjsoncpp_shim.so'),
     'vendor/etc/camera/pureShot_parameter.xml': blob_fixup()
         .regex_replace(r'=(\d+)>', r'="\1">'),
-    'vendor/lib/hw/audio.primary.haydn.so': blob_fixup()
-        .replace_needed('/vendor/lib/liba2dpoffload.so', '/odm/lib/liba2dpoffload.so')
-        .replace_needed('/vendor/lib/libssrec.so', '/odm/lib/libssrec.so')
-        .replace_needed('libaudioroute.so', 'libaudioroute-v34.so'),
     'vendor/lib/libaudioroute_ext.so': blob_fixup()
         .replace_needed('libaudioroute.so', 'libaudioroute-v34.so'),
     'vendor/lib64/hw/camera.qcom.so': blob_fixup()
