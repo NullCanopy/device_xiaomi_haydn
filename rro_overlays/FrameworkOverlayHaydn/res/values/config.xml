@@ -533,4 +533,9 @@
              8 - Camera
              9 - Dialer -->
     <integer name="config_doubleTapDefault">1</integer>
+
+    <!-- The fingerprint HAL is AIDL and gets picked up from VINTF. Listing it
+         here makes system_server look for a HIDL HAL that doesn't exist and
+         retry forever. -->
+    <string-array name="config_biometric_sensors" translatable="false" />
 </resources>
