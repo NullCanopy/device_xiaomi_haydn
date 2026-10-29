@@ -156,9 +156,12 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.opengles.deqp.level-2020-03-01.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.opengles.deqp.level.xml \
     frameworks/native/data/etc/android.software.vulkan.deqp.level-2020-03-01.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.vulkan.deqp.level.xml
 
-# HotwordEnrollement
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/permissions/privapp-permissions-hotword.xml:$(TARGET_COPY_OUT_PRODUCT)/etc/permissions/privapp-permissions-hotword.xml
+# HotwordEnrollment is intentionally not installed: the DSP always-on "Hey
+# Google" keyphrase path can leave the LSM session stuck after the audio HAL
+# is disturbed, and the hotword then reloads the model every few seconds,
+# taking audioserver down on each try (a 3s-play/3s-stall loop for media).
+# Without the enrollment permission Google uses the software hotword only, so
+# the Assistant still works from the button/app and media playback is safe.
 
 # Init
 PRODUCT_COPY_FILES += \
