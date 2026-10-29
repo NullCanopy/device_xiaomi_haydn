@@ -288,5 +288,9 @@ vendor.usb.use_gadget_hal=1
 # Wifi
 wifi.aware.interface=wifi-aware0
 
+# QSPM is reached through ISnapdragonServices, which this vendor doesn't
+# have, and ActivityTrigger's handler would wait for it forever
+ro.vendor.qspm.enable=false
+
 # Zygote
 zygote.critical_window.minute=10
