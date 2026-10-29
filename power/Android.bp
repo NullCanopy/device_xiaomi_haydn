@@ -1,11 +1,16 @@
+//
+// Copyright (C) 2021 The LineageOS Project
+//           (C) 2026 Paranoid Android
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
 cc_library_static {
-    name: "libpowermode-ext-xiaomi",
-    defaults: ["android.hardware.power-ndk_shared"],
-    vendor: true,
-    srcs: [
-        "power-mode.cpp",
-    ],
+    name: "libpowerfeature_ext_haydn",
+    srcs: ["power-feature.cpp"],
     shared_libs: [
         "libbase",
+        "vendor.aospa.power-V1-ndk",
     ],
+    vendor: true,
 }

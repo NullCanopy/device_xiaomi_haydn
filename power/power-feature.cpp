@@ -1,12 +1,16 @@
 /*
- * SPDX-FileCopyrightText: The LineageOS Project
+ * Copyright (C) 2021 The LineageOS Project
+ *           (C) 2026 Paranoid Android
+ *
  * SPDX-License-Identifier: Apache-2.0
  */
 
-#include <aidl/android/hardware/power/BnPower.h>
+#include <aidl/vendor/aospa/power/BnPowerFeature.h>
 #include <android-base/file.h>
 #include <android-base/logging.h>
+#include <fcntl.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
 
 // defines from drivers/input/touchscreen/xiaomi/xiaomi_touch.h
 #define SET_CUR_VALUE 0
@@ -18,27 +22,18 @@
 #define TOUCH_IOC_SETMODE TOUCH_MAGIC + SET_CUR_VALUE
 
 namespace aidl {
-namespace android {
-namespace hardware {
+namespace vendor {
+namespace aospa {
 namespace power {
-namespace impl {
 
-using ::aidl::android::hardware::power::Mode;
-
-bool isDeviceSpecificModeSupported(Mode type, bool* _aidl_return) {
-    switch (type) {
-        case Mode::DOUBLE_TAP_TO_WAKE:
-            *_aidl_return = true;
-            return true;
-        default:
-            return false;
-    }
-}
-
-bool setDeviceSpecificMode(Mode type, bool enabled) {
-    switch (type) {
-        case Mode::DOUBLE_TAP_TO_WAKE: {
+bool setDeviceSpecificFeature(Feature feature, bool enabled) {
+    switch (feature) {
+        case Feature::DOUBLE_TAP: {
             int fd = open(TOUCH_DEV_PATH, O_RDWR);
+            if (fd < 0) {
+                PLOG(ERROR) << "Failed to open " << TOUCH_DEV_PATH;
+                return true;
+            }
             int arg[3] = {TOUCH_ID, Touch_Doubletap_Mode, enabled ? 1 : 0};
             ioctl(fd, TOUCH_IOC_SETMODE, &arg);
             close(fd);
@@ -49,8 +44,7 @@ bool setDeviceSpecificMode(Mode type, bool enabled) {
     }
 }
 
-}  // namespace impl
 }  // namespace power
-}  // namespace hardware
-}  // namespace android
+}  // namespace aospa
+}  // namespace vendor
 }  // namespace aidl
