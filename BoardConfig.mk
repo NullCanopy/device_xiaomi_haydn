@@ -56,9 +56,6 @@ TARGET_CAMERA_PACKAGE_NAME := com.android.camera
 # Display
 TARGET_SCREEN_DENSITY ?= 440
 
-# Filesystem
-TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/configs/config.fs
-
 # HIDL
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
     hardware/xiaomi/vintf/xiaomi_framework_compatibility_matrix.xml
