@@ -1,0 +1,8 @@
+# Kernel zips like AnyKernel3 run as recovery after "Install anyway". They
+# symlink busybox applets into /tmp and flash boot, vendor_boot and dtbo,
+# none of which AOSP's recovery policy allows on A/B devices.
+recovery_only(`
+  allow recovery tmpfs:lnk_file create_file_perms;
+  allow recovery block_device:lnk_file r_file_perms;
+  allow recovery { boot_block_device vendor_custom_ab_block_device }:blk_file rw_file_perms;
+')
