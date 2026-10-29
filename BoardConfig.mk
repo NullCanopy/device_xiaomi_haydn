@@ -1,11 +1,14 @@
 #
-# SPDX-FileCopyrightText: The LineageOS Project
+# Copyright (C) 2021 The LineageOS Project
+#           (C) 2026 Paranoid Android
+#
 # SPDX-License-Identifier: Apache-2.0
 #
 
 DEVICE_PATH := device/xiaomi/haydn
 
 # A/B
+AB_OTA_UPDATER := true
 AB_OTA_PARTITIONS += \
     boot \
     dtbo \
@@ -37,24 +40,17 @@ TARGET_2ND_CPU_VARIANT_RUNTIME := kryo385
 # Assert
 TARGET_OTA_ASSERT_DEVICE := haydn,haydnin
 
-# Audio
-AUDIO_FEATURE_ENABLED_DLKM := true
-AUDIO_FEATURE_ENABLED_EXTENDED_COMPRESS_FORMAT := true
-AUDIO_FEATURE_ENABLED_GEF_SUPPORT := true
-AUDIO_FEATURE_ENABLED_GKI := true
-AUDIO_FEATURE_ENABLED_INSTANCE_ID := true
-AUDIO_FEATURE_ENABLED_PROXY_DEVICE := true
-AUDIO_FEATURE_ENABLED_SSR := true
-AUDIO_FEATURE_ENABLED_SVA_MULTI_STAGE := true
-BOARD_SUPPORTS_OPENSOURCE_STHAL := true
-BOARD_SUPPORTS_SOUND_TRIGGER := true
-BOARD_USES_ALSA_AUDIO := true
-
 # Board
 TARGET_BOOTLOADER_BOARD_NAME := haydn
-
-# Bootloader
 TARGET_NO_BOOTLOADER := true
+
+# Build
+BUILD_BROKEN_DUP_RULES := true
+BUILD_BROKEN_ELF_PREBUILT_PRODUCT_COPY_FILES := true
+BUILD_BROKEN_VENDOR_PROPERTY_NAMESPACE := true
+
+# Camera
+TARGET_CAMERA_PACKAGE_NAME := com.android.camera
 
 # Display
 TARGET_SCREEN_DENSITY ?= 440
@@ -62,17 +58,12 @@ TARGET_SCREEN_DENSITY ?= 440
 # Filesystem
 TARGET_FS_CONFIG_GEN := $(DEVICE_PATH)/configs/config.fs
 
-# GPS
-BOARD_VENDOR_QCOM_GPS_LOC_API_HARDWARE := default
-
 # HIDL
-DEVICE_MATRIX_FILE := hardware/qcom-caf/common/compatibility_matrix.xml
+DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
+    hardware/xiaomi/vintf/xiaomi_framework_compatibility_matrix.xml
 
 ODM_MANIFEST_SKUS += haydn_in
 ODM_MANIFEST_HAYDN_IN_FILES := $(DEVICE_PATH)/configs/hidl/manifest_no_nfc.xml
-DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
-    hardware/qcom-caf/common/vendor_framework_compatibility_matrix.xml \
-    hardware/xiaomi/vintf/xiaomi_framework_compatibility_matrix.xml
 
 DEVICE_MANIFEST_FILE := \
     $(DEVICE_PATH)/configs/hidl/manifest_lahaina.xml \
@@ -105,6 +96,7 @@ BOARD_KERNEL_CMDLINE += swiotlb=0
 BOARD_KERNEL_CMDLINE += pcie_ports=compat
 BOARD_KERNEL_CMDLINE += iptable_raw.raw_before_defrag=1
 BOARD_KERNEL_CMDLINE += ip6table_raw.raw_before_defrag=1
+BOARD_KERNEL_CMDLINE += androidboot.init_fatal_reboot_target=recovery
 
 # Kernel modules
 BOOT_KERNEL_MODULES := \
@@ -142,7 +134,8 @@ BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := f2fs
 BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_VENDOR_DLKMIMAGE_FILE_SYSTEM_TYPE := ext4
 
--include vendor/lineage/config/BoardConfigReservedSize.mk
+BOARD_PRODUCTIMAGE_PARTITION_RESERVED_SIZE := 104857600
+BOARD_SYSTEMIMAGE_PARTITION_RESERVED_SIZE := 104857600
 BOARD_SYSTEM_EXTIMAGE_PARTITION_RESERVED_SIZE := 104857600
 BOARD_VENDORIMAGE_PARTITION_RESERVED_SIZE := 104857600
 
@@ -152,8 +145,15 @@ TARGET_COPY_OUT_SYSTEM_EXT := system_ext
 TARGET_COPY_OUT_VENDOR := vendor
 TARGET_COPY_OUT_VENDOR_DLKM := vendor_dlkm
 
+# Disable sparse for ext/f2fs images
+TARGET_USERIMAGES_SPARSE_EXT_DISABLED := true
+TARGET_USERIMAGES_SPARSE_F2FS_DISABLED := true
+
 # Platform
 TARGET_BOARD_PLATFORM := lahaina
+
+# Power
+TARGET_POWER_FEATURE_EXT_LIB := libpowerfeature_ext_haydn
 
 # Properties
 TARGET_ODM_PROP += $(DEVICE_PATH)/configs/props/odm.prop
@@ -161,9 +161,6 @@ TARGET_PRODUCT_PROP += $(DEVICE_PATH)/configs/props/product.prop
 TARGET_SYSTEM_PROP += $(DEVICE_PATH)/configs/props/system.prop
 TARGET_SYSTEM_EXT_PROP += $(DEVICE_PATH)/configs/props/system_ext.prop
 TARGET_VENDOR_PROP += $(DEVICE_PATH)/configs/props/vendor.prop
-
-# QCOM
-BOARD_USES_QCOM_HARDWARE := true
 
 # Recovery
 BOARD_INCLUDE_DTB_IN_BOOTIMG := true
@@ -173,19 +170,20 @@ TARGET_RECOVERY_PIXEL_FORMAT := RGBX_8888
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 
-# RIL
-ENABLE_VENDOR_RIL_SERVICE := true
-
 # Security patch level
-VENDOR_SECURITY_PATCH := 2025-11-01
+VENDOR_SECURITY_PATCH := $(PLATFORM_SECURITY_PATCH)
 
 # Sepolicy
-include device/lineage/sepolicy/libion/sepolicy.mk
-include device/qcom/sepolicy_vndr/SEPolicy.mk
+include vendor/aospa/sepolicy/libion/sepolicy.mk
 
 SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/private
 SYSTEM_EXT_PUBLIC_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/public
 BOARD_VENDOR_SEPOLICY_DIRS += $(DEVICE_PATH)/sepolicy/vendor
+
+# UFS
+SOONG_CONFIG_NAMESPACES += ufsbsg
+SOONG_CONFIG_ufsbsg += ufsframework
+SOONG_CONFIG_ufsbsg_ufsframework := bsg
 
 # Verified Boot
 BOARD_AVB_ENABLE := true
@@ -202,20 +200,13 @@ BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 1
 BOARD_MOVE_GSI_AVB_KEYS_TO_VENDOR_BOOT := true
 
 # WiFi
-BOARD_WLAN_DEVICE := qcwcn
-BOARD_HOSTAPD_DRIVER := NL80211
-BOARD_HOSTAPD_PRIVATE_LIB := lib_driver_cmd_$(BOARD_WLAN_DEVICE)
-BOARD_WPA_SUPPLICANT_DRIVER := NL80211
-BOARD_WPA_SUPPLICANT_PRIVATE_LIB := lib_driver_cmd_$(BOARD_WLAN_DEVICE)
+CONFIG_ACS := true
 QC_WIFI_HIDL_FEATURE_DUAL_AP := true
+WIFI_HAL_INTERFACE_COMBINATIONS := {{{STA}, 1}, {{AP, AP_BRIDGED}, 1}}, {{{STA}, 1}, {{P2P, NAN}, 1}}, {{{AP}, 2}}, {{{AP_BRIDGED}, 1}}
 WIFI_DRIVER_DEFAULT := wlan
-WIFI_DRIVER_STATE_CTRL_PARAM := "/dev/wlan"
-WIFI_DRIVER_STATE_OFF := "OFF"
-WIFI_DRIVER_STATE_ON := "ON"
+WIFI_FEATURE_HOSTAPD_11AX := true
 WIFI_HIDL_FEATURE_AWARE := true
 WIFI_HIDL_FEATURE_DUAL_INTERFACE := true
-WIFI_HIDL_UNIFIED_SUPPLICANT_SERVICE_RC_ENTRY := true
-WPA_SUPPLICANT_VERSION := VER_0_8_X
 
 # Include proprietary files
 include vendor/xiaomi/haydn/BoardConfigVendor.mk
