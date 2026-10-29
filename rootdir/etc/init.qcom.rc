@@ -188,6 +188,7 @@ on post-fs-data
     mkdir /data/vendor/time/ 0700 system system
 
     # Create PERFD deamon related dirs
+    mkdir /data/vendor/lm 0700 root root
     mkdir /data/vendor/perfd 0770 root system
     chmod 2770 /data/vendor/perfd
     rm /data/vendor/perfd/default_values
