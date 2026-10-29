@@ -18,10 +18,13 @@ genrule {
         "//vendor/xiaomi/haydn:proprietary_rildb_other_sql_files",
         ":rildb_config_sql_files",
     ],
-    tools: [
-        "generate_qcril_db",
+    tool_files: [
+        "generate_db.sh",
     ],
-    cmd: "$(location generate_qcril_db) $(out) $(in)",
+    tools: [
+        "sqlite3",
+    ],
+    cmd: "$(location generate_db.sh) $(location sqlite3) $(out) $(in)",
     out: ["qcrilNr.db"],
 }
 
