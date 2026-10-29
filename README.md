@@ -1,4 +1,5 @@
 Copyright (C) 2022 The LineageOS Project
+          (C) 2026 Paranoid Android
 
 Device configuration for Xiaomi Mi 11X Pro / Mi 11i / Redmi K40 Pro+
 =====================================================================
