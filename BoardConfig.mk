@@ -6,6 +6,7 @@
 #
 
 DEVICE_PATH := device/xiaomi/haydn
+KERNEL_PATH := device/xiaomi/haydn-kernel
 
 # A/B
 AB_OTA_UPDATER := true
@@ -79,9 +80,11 @@ BOARD_KERNEL_SEPARATED_DTBO := true
 BOARD_BOOT_HEADER_VERSION := 3
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
 
-TARGET_KERNEL_ADDITIONAL_FLAGS := TARGET_PRODUCT=$(PRODUCT_DEVICE)
-TARGET_KERNEL_SOURCE := kernel/xiaomi/sm8350
-TARGET_KERNEL_CONFIG := vendor/lahaina-qgki_defconfig vendor/debugfs.config vendor/xiaomi_QGKI.config vendor/haydn_QGKI.config
+# Kernel - Prebuilt
+TARGET_PREBUILT_KERNEL := $(KERNEL_PATH)/Image
+TARGET_BOARD_KERNEL_HEADERS := $(KERNEL_PATH)/kernel-headers
+BOARD_PREBUILT_DTBOIMAGE := $(KERNEL_PATH)/dtbo.img
+BOARD_PREBUILT_DTBIMAGE_DIR := $(KERNEL_PATH)/dtb
 
 BOARD_KERNEL_CMDLINE += androidboot.console=ttyMSM0
 BOARD_KERNEL_CMDLINE += androidboot.hardware=qcom
