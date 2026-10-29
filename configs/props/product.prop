@@ -1,2 +1,28 @@
+# Audio
+af.fast_track_multiplier=1
+audio.deep_buffer.media=true
+audio.offload.min.duration.secs=30
+audio.offload.video=true
+ro.af.client_heap_size_kbyte=7168
+
+# Disable RescueParty due to high risk of data loss
+persist.sys.disable_rescue=true
+
+# FUSE passthrough
+persist.sys.fuse.passthrough.enable=true
+
+# Hardware info
+ro.aospa.soc_name=Qualcomm Snapdragon 888 5G
+
+# LMK tuning
+ro.lmk.swap_compression_ratio=3
+ro.lmk.lowmem_min_oom_score=951
+
+# Qcom
+ro.vendor.qti.va_product.support=1
+
+# 5G NSA
+ro.telephony.sticky_nr_anchor=true
+
 # eBPF
 ro.bpf.kver_override=5.10.239
