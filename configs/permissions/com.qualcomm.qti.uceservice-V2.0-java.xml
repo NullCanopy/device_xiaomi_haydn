@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 Paranoid Android
+
+     SPDX-License-Identifier: Apache-2.0
+-->
+<permissions>
+    <library name="com.qualcomm.qti.uceservice-V2.0-java"
+        file="/system_ext/framework/com.qualcomm.qti.uceservice-V2.0-java.jar" />
+</permissions>

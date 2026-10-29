@@ -371,6 +371,9 @@ PRODUCT_PACKAGES += \
     qcrilNrDb_vendor \
     xiaomi-telephony-stub
 
+PRODUCT_COPY_FILES += \
+    $(LOCAL_PATH)/configs/permissions/com.qualcomm.qti.uceservice-V2.0-java.xml:$(TARGET_COPY_OUT_SYSTEM_EXT)/etc/permissions/com.qualcomm.qti.uceservice-V2.0-java.xml
+
 PRODUCT_BOOT_JARS += \
     xiaomi-telephony-stub
 
